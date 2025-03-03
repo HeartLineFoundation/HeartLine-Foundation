@@ -146,41 +146,51 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Initialize loading screen
-window.addEventListener('DOMContentLoaded', () => {
-    const loadingScreen = document.querySelector('.loading-screen');
-    const mainContent = document.querySelector('main');
-    
-    if (loadingScreen && mainContent) {
-        mainContent.style.opacity = '0';
-        
-        // Hide loading screen after all resources are loaded
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                loadingScreen.style.pointerEvents = 'none';
-                mainContent.style.opacity = '1';
-                
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 500);
-            }, 1000);
-        });
-        
-        // Fallback in case load event doesn't fire
-        setTimeout(() => {
-            if (loadingScreen.style.display !== 'none') {
-                loadingScreen.style.opacity = '0';
-                loadingScreen.style.pointerEvents = 'none';
-                mainContent.style.opacity = '1';
-                
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 500);
-            }
-        }, 5000);
-    }
+// Initialize the website
+document.addEventListener('DOMContentLoaded', () => {
+    initializeNavigation();
+    initializeAnimations();
+    initializeHealthcareLocator();
+    initializeAIAssistant();
 });
+
+function initializeAnimations() {
+    // GSAP Animations
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Animate hero section
+    gsap.from('.hero-content', {
+        opacity: 0,
+        y: 50,
+        duration: 1,
+        ease: 'power3.out'
+    });
+
+    // Animate cards on scroll
+    gsap.utils.toArray('.card-3d').forEach(card => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top bottom-=100',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            ease: 'power3.out'
+        });
+    });
+}
+
+function initializeHealthcareLocator() {
+    const healthcareLocator = new HealthcareLocator();
+    healthcareLocator.initialize();
+}
+
+function initializeAIAssistant() {
+    const aiAssistant = new AIHealthAssistant();
+    aiAssistant.initialize();
+}
 
 // Navigation
 const nav = document.querySelector('.nav-container');
@@ -551,31 +561,6 @@ class AIHealthAssistant {
         }
     }
 }
-
-// Initialize features when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    const healthcareLocator = new HealthcareLocator();
-    const aiAssistant = new AIHealthAssistant();
-    
-    // Initialize GSAP animations
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // Animate sections on scroll
-    gsap.utils.toArray('section').forEach(section => {
-        gsap.from(section.children, {
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-                trigger: section,
-                start: 'top 80%',
-                end: 'top 20%',
-                toggleActions: 'play none none reverse'
-            }
-        });
-    });
-});
 
 // Parallax Effect
 window.addEventListener('scroll', () => {
