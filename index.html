@@ -3,213 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heartline Foundation - AI-Driven Cardiology Innovation</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>HeartLine Foundation</title>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="scroll-progress"></div>
-    <div id="canvas-container"></div>
+    <!-- 3D Background -->
+    <canvas id="bg"></canvas>
     
+    <!-- Navigation -->
     <nav>
         <div class="logo">
-            <a href="#home">Heartline Foundation</a>
+            <a href="#">HeartLine Foundation</a>
         </div>
         <div class="nav-links">
             <a href="#about">About</a>
             <a href="#solutions">Solutions</a>
-            <a href="#research">Research</a>
             <a href="#team">Team</a>
-            <a href="#contact" class="contact-btn">Contact</a>
+            <a href="#contact" class="contact-btn">Contact Us</a>
         </div>
-        <div class="menu-btn">
+        <button class="menu-toggle">
             <i class="fas fa-bars"></i>
-        </div>
+        </button>
     </nav>
-
-    <section id="home" class="hero">
+    
+    <!-- Hero Section -->
+    <section class="hero">
         <div class="hero-content">
-            <h1 class="pre-animate">
-                <span>Advancing</span>
-                <span class="highlight">Cardiovascular</span>
-                <span>Health Through</span>
-                <span>AI Innovation</span>
+            <h1>
+                <span>Transforming</span>
+                <span class="gradient-text">Heart Health</span>
+                <span>Through Innovation</span>
             </h1>
-            <p class="pre-animate reveal-delay-1">The Heartline Foundation is dedicated to improving heart health through cutting-edge technology, research, and compassionate care.</p>
-            <div class="cta-buttons pre-animate reveal-delay-2">
-                <a href="#solutions" class="primary-btn">Explore Solutions</a>
-                <a href="#about" class="secondary-btn">Learn More</a>
+            <p>We're a student-led nonprofit dedicated to revolutionizing cardiology through AI-driven solutions and making heart healthcare accessible to all.</p>
+            <div class="cta-buttons">
+                <a href="#solutions" class="btn btn-primary">Our Solutions</a>
+                <a href="#contact" class="btn btn-secondary">Get Involved</a>
             </div>
         </div>
-        <div class="hero-3d-model" id="heart-model"></div>
+        <div class="hero-visual"></div>
     </section>
-
-    <section id="about" class="about">
-        <div class="about-content">
-            <h2 class="pre-animate">About The Heartline Foundation</h2>
-            <p class="section-subtitle pre-animate reveal-delay-1">A student-led initiative transforming cardiology through AI-driven innovation.</p>
-            <div class="about-text pre-animate reveal-delay-2">
-                <p>Heartline Foundation is a student-led nonprofit founded in 2025 with a mission to transform cardiology through AI-driven innovation. As a high school-led initiative, we are committed to using artificial intelligence to enhance heart health diagnostics and accessibility.</p>
-                <p>Beyond technology, we actively organize fundraisers and donation drives to support heart patients in need. Our focus remains on making a meaningful impact in the field of cardiology and improving lives through innovation and community support.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="solutions" class="solutions">
-        <h2 class="pre-animate">Our Solutions</h2>
-        <p class="section-subtitle pre-animate reveal-delay-1">Innovative AI-driven solutions for better heart health</p>
-        <div class="solutions-grid">
-            <div class="solution-card pre-animate reveal-delay-1">
-                <div class="solution-icon">
-                    <i class="fas fa-brain"></i>
+    
+    <!-- About Section -->
+    <section id="about">
+        <div class="section-content">
+            <h2>Our Mission</h2>
+            <p class="section-subtitle">Dedicated to improving heart health through technology and compassion</p>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-heartbeat"></i>
                 </div>
-                <h3>AI Diagnostics</h3>
-                <p>Advanced machine learning algorithms for early detection and accurate diagnosis of cardiovascular conditions.</p>
+                <h3>Who We Are</h3>
+                <p>HeartLine Foundation is a student-led initiative founded in 2025, bringing together young innovators passionate about transforming cardiac care through artificial intelligence and community support.</p>
             </div>
-            <div class="solution-card pre-animate reveal-delay-2">
-                <div class="solution-icon">
-                    <i class="fas fa-mobile-alt"></i>
+        </div>
+    </section>
+    
+    <!-- Solutions Section -->
+    <section id="solutions">
+        <div class="section-content">
+            <h2>Our Solutions</h2>
+            <p class="section-subtitle">Innovative approaches to heart health</p>
+            <div class="solutions-grid">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Diagnostics</h3>
+                    <p>Advanced artificial intelligence systems for early detection and monitoring of heart conditions.</p>
                 </div>
-                <h3>Mobile Health</h3>
-                <p>Accessible health monitoring through smartphone applications and wearable technology.</p>
-            </div>
-            <div class="solution-card pre-animate reveal-delay-3">
-                <div class="solution-icon">
-                    <i class="fas fa-chart-line"></i>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3>Community Support</h3>
+                    <p>Programs and resources to support heart patients and their families through their journey.</p>
                 </div>
-                <h3>Predictive Analytics</h3>
-                <p>Data-driven insights for personalized treatment plans and risk assessment.</p>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heartline Foundation - AI-Driven Cardiology Innovation</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Three.js and Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <!-- GSAP Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 3D Background Canvas -->
+    <canvas id="bg"></canvas>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Navigation -->
+        <nav>
+            <div class="logo">
+                <a href="#home">Heartline Foundation</a>
             </div>
-        </div>
-    </section>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#solutions">Solutions</a>
+                <a href="#research">Research</a>
+                <a href="#team">Team</a>
+                <a href="#contact" class="contact-btn">Contact</a>
+            </div>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
 
-    <section id="research" class="research">
-        <h2 class="pre-animate">Our Research</h2>
-        <p class="section-subtitle pre-animate reveal-delay-1">Pushing the boundaries of cardiovascular care through technology</p>
-        <div class="research-grid">
-            <div class="research-card pre-animate reveal-delay-1">
-                <h3>AI in Cardiology</h3>
-                <ul>
-                    <li>Machine learning for early detection</li>
-                    <li>Pattern recognition in ECG data</li>
-                    <li>Automated diagnosis systems</li>
-                </ul>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>
+                    <span>Advancing</span>
+                    <span class="gradient-text">Cardiovascular</span>
+                    <span>Health Through</span>
+                    <span>AI Innovation</span>
+                </h1>
+                <p>The Heartline Foundation is dedicated to improving heart health through cutting-edge technology, research, and compassionate care.</p>
+                <div class="cta-buttons">
+                    <a href="#solutions" class="btn btn-primary">Explore Solutions</a>
+                    <a href="#about" class="btn btn-secondary">Learn More</a>
+                </div>
             </div>
-            <div class="research-card pre-animate reveal-delay-2">
-                <h3>Mobile Health Solutions</h3>
-                <ul>
-                    <li>Remote patient monitoring</li>
-                    <li>Real-time health tracking</li>
-                    <li>Telemedicine integration</li>
-                </ul>
+            <div class="hero-visual">
+                <div class="heart-model-container"></div>
             </div>
-            <div class="research-card pre-animate reveal-delay-3">
-                <h3>Preventive Care</h3>
-                <ul>
-                    <li>Risk factor analysis</li>
-                    <li>Lifestyle intervention studies</li>
-                    <li>Population health research</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="team" class="team">
-        <h2 class="pre-animate">Meet Our Team</h2>
-        <p class="section-subtitle pre-animate reveal-delay-1">Passionate students driving innovation in cardiovascular health</p>
-        <div class="team-profiles">
-            <div class="profile pre-animate reveal-delay-1">
-                <img src="1728444150858.jpg" alt="Mithun Gopinath" class="profile-pic">
-                <h3>Mithun Gopinath</h3>
-                <p>Founder</p>
+        <!-- About Section -->
+        <section id="about" class="about">
+            <div class="section-content">
+                <h2>About The Heartline Foundation</h2>
+                <p class="section-subtitle">A student-led initiative transforming cardiology through AI-driven innovation.</p>
+                <div class="about-text">
+                    <p>Heartline Foundation is a student-led nonprofit founded in 2025 with a mission to transform cardiology through AI-driven innovation. As a high school-led initiative, we are committed to using artificial intelligence to enhance heart health diagnostics and accessibility.</p>
+                    <p>Beyond technology, we actively organize fundraisers and donation drives to support heart patients in need. Our focus remains on making a meaningful impact in the field of cardiology and improving lives through innovation and community support.</p>
+                </div>
             </div>
-            <div class="profile pre-animate reveal-delay-2">
-                <img src="1728828110214.jpg" alt="Shubh Patel" class="profile-pic">
-                <h3>Shubh Patel</h3>
-                <p>Vice President & Web Developer</p>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="contact" class="contact">
-        <div class="contact-container">
-            <h2 class="pre-animate">Get In Touch</h2>
-            <p class="section-subtitle pre-animate reveal-delay-1">Join us in our mission to transform cardiovascular care</p>
-            <div class="social-links pre-animate reveal-delay-2">
-                <a href="https://www.instagram.com/the_heartlinefoundation/" class="social-link" target="_blank">
-                    <i class="fab fa-instagram"></i>
-                    Follow us on Instagram
-                </a>
-                <a href="mailto:contact@heartlinefoundation.org" class="social-link">
-                    <i class="fas fa-envelope"></i>
-                    Email Us
-                </a>
+        <!-- Solutions Section -->
+        <section id="solutions" class="solutions">
+            <div class="section-content">
+                <h2>Our Solutions</h2>
+                <p class="section-subtitle">Innovative AI-driven solutions for better heart health</p>
+                <div class="solutions-grid">
+                    <div class="card" data-tilt>
+                        <div class="card-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>AI Diagnostics</h3>
+                        <p>Advanced machine learning algorithms for early detection and accurate diagnosis of cardiovascular conditions.</p>
+                    </div>
+                    <div class="card" data-tilt>
+                        <div class="card-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Mobile Health</h3>
+                        <p>Accessible health monitoring through smartphone applications and wearable technology.</p>
+                    </div>
+                    <div class="card" data-tilt>
+                        <div class="card-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Predictive Analytics</h3>
+                        <p>Data-driven insights for personalized treatment plans and risk assessment.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
+        <!-- Team Section -->
+        <section id="team" class="team">
+            <div class="section-content">
+                <h2>Meet Our Team</h2>
+                <p class="section-subtitle">Passionate students driving innovation in cardiovascular health</p>
+                <div class="team-grid">
+                    <div class="team-member" data-tilt>
+                        <img src="1728444150858.jpg" alt="Mithun Gopinath">
+                        <h3>Mithun Gopinath</h3>
+                        <p>Founder</p>
+                    </div>
+                    <div class="team-member" data-tilt>
+                        <img src="1728828110214.jpg" alt="Shubh Patel">
+                        <h3>Shubh Patel</h3>
+                        <p>Vice President & Web Developer</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact">
+            <div class="section-content">
+                <h2>Get In Touch</h2>
+                <p class="section-subtitle">Join us in our mission to transform cardiovascular care</p>
+                <div class="contact-links">
+                    <a href="https://www.instagram.com/the_heartlinefoundation/" class="contact-link" target="_blank">
+                        <i class="fab fa-instagram"></i>
+                        Follow us on Instagram
+                    </a>
+                    <a href="mailto:contact@heartlinefoundation.org" class="contact-link">
+                        <i class="fas fa-envelope"></i>
+                        Email Us
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- AI Health Assistant -->
     <div id="ai-assistant" class="ai-assistant">
-        <div class="ai-assistant-header">
-            <h3>AI Health Assistant</h3>
+        <div class="ai-header">
+            <h3><i class="fas fa-robot"></i> AI Health Assistant</h3>
             <button class="toggle-ai">
-                <i class="fas fa-robot"></i>
+                <i class="fas fa-chevron-down"></i>
             </button>
         </div>
-        <div class="ai-assistant-body">
+        <div class="ai-body">
             <div class="messages"></div>
-            <div class="input-container">
-                <input type="text" placeholder="Ask me anything about heart health...">
-                <button class="send">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-            <div class="features">
-                <button class="feature-btn" data-feature="diagnosis">
+            <div class="quick-actions">
+                <button data-action="checkup">
                     <i class="fas fa-heartbeat"></i>
-                    Symptom Check
+                    Quick Checkup
                 </button>
-                <button class="feature-btn" data-feature="tips">
-                    <i class="fas fa-notes-medical"></i>
-                    Health Tips
-                </button>
-                <button class="feature-btn" data-feature="emergency">
+                <button data-action="emergency">
                     <i class="fas fa-ambulance"></i>
                     Emergency
+                </button>
+                <button data-action="tips">
+                    <i class="fas fa-lightbulb"></i>
+                    Health Tips
+                </button>
+            </div>
+            <div class="input-area">
+                <input type="text" placeholder="Ask me about heart health...">
+                <button class="send">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-main">
-                <div class="footer-brand">
-                    <div class="logo">
-                        <a href="#home">Heartline Foundation</a>
-                    </div>
-                    <p>Transforming cardiology through AI-driven innovation.</p>
-                </div>
-                <div class="footer-links">
-                    <div class="link-group">
-                        <h3>Quick Links</h3>
-                        <a href="#about">About Us</a>
-                        <a href="#solutions">Solutions</a>
-                        <a href="#research">Research</a>
-                        <a href="#team">Team</a>
-                        <a href="#contact">Contact</a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Heartline Foundation. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
     <script src="script.js"></script>
