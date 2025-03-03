@@ -44,57 +44,9 @@ body {
     z-index: -1;
 }
 
-/* Loading Screen */
-.loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: var(--background);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: all 0.5s ease-in-out;
-}
-
-.loader {
-    width: 60px;
-    height: 60px;
-    border: 3px solid var(--primary);
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
-}
-
-.loading-screen p {
-    color: var(--text);
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-top: 1rem;
-    opacity: 0.9;
-    text-align: center;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-    0% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 0.6; transform: scale(1); }
-}
-
-/* Make sure main content fades in smoothly */
+/* Make main content visible by default */
 main {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
 }
 
 /* Navigation */
