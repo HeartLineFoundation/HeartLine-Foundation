@@ -147,30 +147,40 @@ window.addEventListener('resize', () => {
 });
 
 // Initialize loading screen
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
     const loadingScreen = document.querySelector('.loading-screen');
-    if (loadingScreen) {
-        setTimeout(() => {
-            loadingScreen.style.opacity = '0';
-            loadingScreen.style.pointerEvents = 'none';
+    const mainContent = document.querySelector('main');
+    
+    if (loadingScreen && mainContent) {
+        mainContent.style.opacity = '0';
+        
+        // Hide loading screen after all resources are loaded
+        window.addEventListener('load', () => {
             setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 500);
-        }, 1500);
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.pointerEvents = 'none';
+                mainContent.style.opacity = '1';
+                
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+        
+        // Fallback in case load event doesn't fire
+        setTimeout(() => {
+            if (loadingScreen.style.display !== 'none') {
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.pointerEvents = 'none';
+                mainContent.style.opacity = '1';
+                
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }, 5000);
     }
 });
-
-// Fallback for loading screen in case load event doesn't fire
-setTimeout(() => {
-    const loadingScreen = document.querySelector('.loading-screen');
-    if (loadingScreen && loadingScreen.style.display !== 'none') {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.pointerEvents = 'none';
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-        }, 500);
-    }
-}, 3000);
 
 // Navigation
 const nav = document.querySelector('.nav-container');
