@@ -147,14 +147,30 @@ window.addEventListener('resize', () => {
 });
 
 // Initialize loading screen
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        document.querySelector('.loading-screen').style.opacity = '0';
+window.addEventListener('load', () => {
+    const loadingScreen = document.querySelector('.loading-screen');
+    if (loadingScreen) {
         setTimeout(() => {
-            document.querySelector('.loading-screen').style.display = 'none';
-        }, 500);
-    }, 1500);
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.pointerEvents = 'none';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }, 1500);
+    }
 });
+
+// Fallback for loading screen in case load event doesn't fire
+setTimeout(() => {
+    const loadingScreen = document.querySelector('.loading-screen');
+    if (loadingScreen && loadingScreen.style.display !== 'none') {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.pointerEvents = 'none';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
+}, 3000);
 
 // Navigation
 const nav = document.querySelector('.nav-container');
