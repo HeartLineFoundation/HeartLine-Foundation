@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Scroll reveal animation
+    // Intersection Observer for animations
     const observerOptions = {
         root: null,
         rootMargin: '0px',
@@ -172,15 +172,68 @@ document.addEventListener('DOMContentLoaded', () => {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('reveal', 'active');
+                entry.target.classList.add('reveal');
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Observe elements to animate
-    document.querySelectorAll('.solution-card, .research-card, .value-card, .about-text').forEach(el => {
-        observer.observe(el);
+    document.querySelectorAll('.pre-animate').forEach(element => {
+        observer.observe(element);
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-links') && !e.target.closest('.menu-btn')) {
+            navLinks.classList.remove('active');
+        }
+    });
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Close mobile menu after clicking a link
+                navLinks.classList.remove('active');
+            }
+        });
+    });
+
+    // Scroll progress indicator
+    const scrollProgress = document.querySelector('.scroll-progress');
+
+    window.addEventListener('scroll', () => {
+        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        scrollProgress.style.transform = `scaleX(${scrolled / 100})`;
+    });
+
+    // Add active class to nav links on scroll
+    const sections = document.querySelectorAll('section');
+    const navItems = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.scrollY >= sectionTop - 60) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href').slice(1) === current) {
+                item.classList.add('active');
+            }
+        });
     });
 
     // Navbar scroll effect with progress bar
