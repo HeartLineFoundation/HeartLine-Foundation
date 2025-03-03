@@ -1,308 +1,706 @@
-// Chatbot knowledge base
-const chatbotResponses = {
-    // Heart-related questions
-    'heart attack symptoms': 'Common heart attack symptoms include chest pain/pressure, shortness of breath, pain in arms/jaw, nausea, and cold sweats. If you experience these symptoms, seek immediate medical attention.',
-    'heart health tips': 'To maintain heart health: exercise regularly, eat a balanced diet, maintain healthy weight, avoid smoking, limit alcohol, manage stress, and get regular check-ups.',
-    'blood pressure': 'Normal blood pressure is generally considered below 120/80 mmHg. High blood pressure can lead to heart disease and should be monitored regularly.',
-    
-    // Nonprofit information
-    'about foundation': 'Heartline Foundation is a student-led nonprofit founded in 2025, dedicated to transforming cardiology through AI-driven innovation and making heart healthcare more accessible.',
-    'mission': 'Our mission is to improve heart health through cutting-edge technology, research, and compassionate care, while making cardiac care more accessible to all.',
-    'team': 'Our team is led by Mithun Gopinath (Founder) and Shubh Patel (Vice President), along with dedicated volunteers committed to improving heart health through innovation.',
-    'contact': 'You can reach us through our Instagram @the_heartlinefoundation or email us directly.',
-    
-    // Default responses
-    'default': "I'm here to help with questions about heart health and our foundation. Could you please rephrase your question?",
-    'greeting': "Hello! I'm the Heartline AI Assistant. How can I help you today?",
-};
-
-// Function to find the best matching response
-function findBestResponse(input) {
-    input = input.toLowerCase();
-    
-    // Check for greetings
-    if (input.match(/\b(hi|hello|hey|greetings)\b/)) {
-        return chatbotResponses.greeting;
-    }
-    
-    // Find the best matching topic
-    let bestMatch = null;
-    let highestScore = 0;
-    
-    for (let topic in chatbotResponses) {
-        if (topic !== 'default' && topic !== 'greeting') {
-            const score = calculateMatchScore(input, topic);
-            if (score > highestScore) {
-                highestScore = score;
-                bestMatch = topic;
-            }
-        }
-    }
-    
-    return highestScore > 0.3 ? chatbotResponses[bestMatch] : chatbotResponses.default;
+:root {
+    --primary-color: #1a1a1a;
+    --secondary-color: #ffffff;
+    --accent-color: #ff3d00;
+    --text-color: #333333;
+    --text-light: #666666;
+    --background: #ffffff;
+    --background-alt: #f8f9fa;
+    --spacing-unit: 8px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --container-width: 1200px;
 }
 
-// Calculate match score between input and topic
-function calculateMatchScore(input, topic) {
-    const topicWords = topic.split(' ');
-    let matchCount = 0;
-    
-    topicWords.forEach(word => {
-        if (input.includes(word)) matchCount++;
-    });
-    
-    return matchCount / topicWords.length;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize chatbot UI
-    const chatContainer = document.getElementById('chatbot-container');
-    const toggleChat = document.getElementById('toggle-chat');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-message');
-    
-    // Toggle chat visibility
-    toggleChat.addEventListener('click', () => {
-        chatContainer.classList.toggle('collapsed');
-        if (!chatContainer.classList.contains('collapsed')) {
-            chatInput.focus();
-        }
-    });
-    
-    // Function to add message to chat
-    function addMessage(message, isUser = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-        messageDiv.textContent = message;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+    background-color: var(--background);
+}
+
+/* Navigation */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    padding: calc(var(--spacing-unit) * 2) 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.logo a {
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    letter-spacing: -0.5px;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.text-heart {
+    color: var(--primary-red);
+}
+
+.text-line {
+    color: var(--primary-blue);
+}
+
+.nav-links {
+    display: flex;
+    gap: calc(var(--spacing-unit) * 4);
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+
+.nav-links a:hover {
+    color: var(--accent-color);
+}
+
+.contact-btn {
+    background: var(--primary-color);
+    color: var(--secondary-color) !important;
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+    border-radius: 2px;
+}
+
+.contact-btn:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 0 5%;
+    position: relative;
+    background: var(--background);
+    overflow: hidden;
+}
+
+.hero-content {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-logo {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+    width: 300px;
+    height: auto;
+    opacity: 0.8;
+    animation: float 20s infinite;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 4.5rem;
+    line-height: 1.1;
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.hero h1 span {
+    display: block;
+}
+
+.hero h1 .highlight {
+    color: var(--accent-color);
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: calc(var(--spacing-unit) * 6);
+    color: var(--text-light);
+    max-width: 600px;
+}
+
+.hero-shapes {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+    opacity: 0.1;
+    animation: float 20s infinite;
+}
+
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    right: -150px;
+}
+
+.shape-2 {
+    width: 200px;
+    height: 200px;
+    bottom: 50%;
+    right: 10%;
+    animation-delay: -5s;
+}
+
+.shape-3 {
+    width: 150px;
+    height: 150px;
+    bottom: -75px;
+    right: 35%;
+    animation-delay: -10s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-25px, 25px) rotate(5deg); }
+    50% { transform: translate(25px, -25px) rotate(-5deg); }
+    75% { transform: translate(-25px, -25px) rotate(5deg); }
+}
+
+/* Buttons */
+.cta-buttons {
+    display: flex;
+    gap: calc(var(--spacing-unit) * 3);
+}
+
+.primary-btn, .secondary-btn {
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.secondary-btn {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.primary-btn:hover {
+    background: var(--accent-color);
+}
+
+.secondary-btn:hover {
+    background: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+/* Sections */
+section {
+    padding: calc(var(--spacing-unit) * 12) 5%;
+    position: relative;
+}
+
+h2 {
+    font-size: 3rem;
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    text-align: left;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+    text-align: left;
+    color: var(--text-light);
+    margin-bottom: calc(var(--spacing-unit) * 8);
+    font-size: 1.25rem;
+    max-width: 600px;
+}
+
+/* About Section */
+.about {
+    background: #f8f9fa;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-text {
+    margin-bottom: 2rem;
+}
+
+.goal-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+}
+
+.goal-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-red);
+    margin-bottom: 1rem;
+}
+
+/* Solutions Grid */
+.solutions-grid, .research-grid, .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: calc(var(--spacing-unit) * 4);
+    margin-top: calc(var(--spacing-unit) * 6);
+}
+
+.solution-card, .research-card, .value-card {
+    background: var(--background);
+    padding: calc(var(--spacing-unit) * 4);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    position: relative;
+}
+
+.solution-card:hover, .research-card:hover, .value-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+}
+
+.solution-icon, .value-card .icon {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.solution-card h3, .research-card h3, .value-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.solution-card p, .research-card p, .value-card p {
+    color: var(--text-light);
+    margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+/* Research Cards */
+.research-card {
+    background: var(--background);
+    padding: calc(var(--spacing-unit) * 4);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.research-card ul {
+    list-style: none;
+    margin-top: calc(var(--spacing-unit) * 2);
+}
+
+.research-card ul li {
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    padding-left: calc(var(--spacing-unit) * 3);
+    position: relative;
+    color: var(--text-light);
+}
+
+.research-card ul li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+}
+
+/* Contact Section */
+.contact {
+    background: var(--background-alt);
+}
+
+.contact-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.social-links {
+    display: flex;
+    gap: calc(var(--spacing-unit) * 3);
+    margin-top: calc(var(--spacing-unit) * 6);
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 2);
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+}
+
+.social-link:hover {
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    border-color: var(--primary-color);
+}
+
+/* Footer */
+footer {
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    padding: calc(var(--spacing-unit) * 8) 5% calc(var(--spacing-unit) * 4);
+}
+
+.footer-content {
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.footer-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: calc(var(--spacing-unit) * 8);
+    margin-bottom: calc(var(--spacing-unit) * 6);
+}
+
+.footer-brand p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: calc(var(--spacing-unit) * 2);
+}
+
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: calc(var(--spacing-unit) * 4);
+}
+
+.link-group h3 {
+    font-size: 1rem;
+    margin-bottom: calc(var(--spacing-unit) * 3);
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.link-group a {
+    display: block;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    transition: var(--transition);
+}
+
+.link-group a:hover {
+    color: var(--accent-color);
+}
+
+.footer-bottom {
+    padding-top: calc(var(--spacing-unit) * 4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    // Handle sending messages
-    function sendMessage() {
-        const message = chatInput.value.trim();
-        if (message) {
-            addMessage(message, true);
-            chatInput.value = '';
-            
-            // Get bot response
-            setTimeout(() => {
-                const response = findBestResponse(message);
-                addMessage(response);
-            }, 500);
-        }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    // Send message on button click
-    sendButton.addEventListener('click', sendMessage);
-    
-    // Send message on Enter key
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-    
-    // Mobile menu toggle
-    const menuBtn = document.querySelector('.menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100px);
+        opacity: 0;
     }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
 
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu if open
-                navLinks.classList.remove('active');
-            }
-        });
-    });
+.pre-animate {
+    opacity: 0;
+    transform: translateY(20px);
+}
 
-    // Enhanced 3D card effects
-    const cards = document.querySelectorAll('.solution-card, .research-card, .value-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = ((y - centerY) / centerY) * 10;
-            const rotateY = ((x - centerX) / centerX) * 10;
-            
-            card.style.transform = `perspective(1000px) rotateX(${-rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-            card.style.transition = 'none';
-            
-            // Add glowing effect
-            const glowX = (x / rect.width) * 100;
-            const glowY = (y / rect.height) * 100;
-            card.style.background = `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255,255,255,0.2), transparent)`;
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-            card.style.transition = 'all 0.5s ease';
-            card.style.background = 'white';
-        });
-    });
+.reveal {
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
 
-    // Intersection Observer for animations
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-    };
+.reveal-delay-1 {
+    animation-delay: 0.2s;
+}
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('reveal');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
+.reveal-delay-2 {
+    animation-delay: 0.4s;
+}
 
-    document.querySelectorAll('.pre-animate').forEach(element => {
-        observer.observe(element);
-    });
+.reveal-delay-3 {
+    animation-delay: 0.6s;
+}
 
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.nav-links') && !e.target.closest('.menu-btn')) {
-            navLinks.classList.remove('active');
-        }
-    });
+/* Scroll Progress Bar */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-color);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.1s ease;
+    z-index: 1001;
+}
 
-    // Smooth scroll for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu after clicking a link
-                navLinks.classList.remove('active');
-            }
-        });
-    });
+/* Mobile Menu */
+.menu-btn {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
 
-    // Scroll progress indicator
-    const scrollProgress = document.querySelector('.scroll-progress');
-
-    window.addEventListener('scroll', () => {
-        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (window.scrollY / windowHeight) * 100;
-        scrollProgress.style.transform = `scaleX(${scrolled / 100})`;
-    });
-
-    // Add active class to nav links on scroll
-    const sections = document.querySelectorAll('section');
-    const navItems = document.querySelectorAll('.nav-links a');
-
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (window.scrollY >= sectionTop - 60) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href').slice(1) === current) {
-                item.classList.add('active');
-            }
-        });
-    });
-
-    // Navbar scroll effect with progress bar
-    let lastScroll = 0;
-    const navbar = document.querySelector('nav');
-    
-    // Create progress bar
-    const progressBar = document.createElement('div');
-    progressBar.className = 'scroll-progress';
-    document.body.appendChild(progressBar);
-
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        
-        // Update progress bar
-        const scrolled = (currentScroll / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        progressBar.style.width = `${scrolled}%`;
-        
-        // Navbar hide/show effect
-        if (currentScroll <= 0) {
-            navbar.classList.remove('scroll-up');
-            return;
-        }
-        
-        if (currentScroll > lastScroll && !navbar.classList.contains('scroll-down')) {
-            navbar.classList.remove('scroll-up');
-            navbar.classList.add('scroll-down');
-        } else if (currentScroll < lastScroll && navbar.classList.contains('scroll-down')) {
-            navbar.classList.remove('scroll-down');
-            navbar.classList.add('scroll-up');
-        }
-        lastScroll = currentScroll;
-    });
-
-    // Parallax effect for hero section
-    const hero = document.querySelector('.hero');
-    const heroContent = document.querySelector('.hero-content');
-    
-    window.addEventListener('scroll', () => {
-        const scroll = window.pageYOffset;
-        if (hero && heroContent) {
-            hero.style.backgroundPositionY = `${scroll * 0.5}px`;
-            heroContent.style.transform = `translateY(${scroll * 0.3}px)`;
-            heroContent.style.opacity = 1 - (scroll * 0.003);
-        }
-    });
-
-    // Animate hero text on load
-    const heroText = document.querySelector('.hero h1');
-    if (heroText) {
-        heroText.style.opacity = '0';
-        heroText.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            heroText.style.transition = 'all 1s ease';
-            heroText.style.opacity = '1';
-            heroText.style.transform = 'translateY(0)';
-        }, 500);
+@media (max-width: 768px) {
+    .menu-btn {
+        display: block;
     }
 
-    // Add hover effect to buttons
-    document.querySelectorAll('.primary-btn, .secondary-btn').forEach(button => {
-        button.addEventListener('mousemove', (e) => {
-            const rect = button.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            button.style.setProperty('--x', `${x}px`);
-            button.style.setProperty('--y', `${y}px`);
-        });
-    });
-});
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--background);
+        padding: calc(var(--spacing-unit) * 2);
+        flex-direction: column;
+        align-items: flex-start;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+    }
+
+    .solutions-grid, .research-grid, .values-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr;
+        gap: calc(var(--spacing-unit) * 4);
+    }
+
+    .team-profiles {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 3D Transform Effects */
+.solution-card, .research-card, .value-card {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.solution-card:hover, .research-card:hover, .value-card:hover {
+    transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+}
+
+/* Team Section */
+.team-profiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: calc(var(--spacing-unit) * 4);
+    margin-top: calc(var(--spacing-unit) * 6);
+}
+
+.profile {
+    text-align: center;
+}
+
+.profile-pic {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 2px;
+    margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.profile h3 {
+    font-size: 1.5rem;
+    margin-bottom: calc(var(--spacing-unit));
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.profile p {
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+/* Chatbot Styles */
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+}
+
+.chatbot-container.collapsed {
+    height: 60px;
+    overflow: hidden;
+}
+
+.chatbot-container.collapsed .chat-body {
+    display: none;
+}
+
+.chat-header {
+    background: var(--primary-blue);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.toggle-chat {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.chat-body {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+}
+
+.user-message {
+    background: #e3f2fd;
+    margin-left: auto;
+}
+
+.bot-message {
+    background: #f5f5f5;
+    margin-right: auto;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    margin-right: 10px;
+}
+
+#send-message {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+#send-message:hover {
+    transform: scale(1.1);
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
