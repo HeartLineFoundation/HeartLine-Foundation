@@ -32,6 +32,7 @@
     <div class="loading-screen">
         <div class="loader"></div>
         <p>Loading HeartLine Experience...</p>
+        <p class="loading-progress" style="font-size: 0.9rem; margin-top: 0.5rem;">Please wait...</p>
     </div>
 
     <!-- Navigation -->
@@ -56,129 +57,131 @@
         </button>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1 class="animate-text">
-                <span>Revolutionizing</span>
-                <span class="gradient-text">Heart Health</span>
-                <span>Through AI & Innovation</span>
-            </h1>
-            <p class="hero-description">Empowering communities with advanced AI-driven cardiovascular care and accessible health solutions.</p>
-            <div class="cta-group">
-                <button class="primary-btn" onclick="document.getElementById('find-care').scrollIntoView({behavior: 'smooth'})">
-                    Find Care Near You
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-                <button class="secondary-btn" onclick="openAIAssistant()">
-                    Talk to AI Assistant
-                    <i class="fas fa-robot"></i>
-                </button>
-            </div>
-        </div>
-        <div class="hero-3d">
-            <spline-viewer url="https://prod.spline.design/iq5yCbw5hRGhsW8D/scene.splinecode" loading="lazy"></spline-viewer>
-        </div>
-    </section>
-
-    <!-- Find Care Section -->
-    <section id="find-care" class="find-care">
-        <div class="section-content">
-            <h2>Find Cardiovascular Care</h2>
-            <p class="section-subtitle">Locate specialized care based on your location and insurance</p>
-            
-            <div class="search-container">
-                <div class="search-filters">
-                    <div class="search-group">
-                        <i class="fas fa-location-dot"></i>
-                        <input type="text" id="location-input" placeholder="Enter ZIP code or address">
-                    </div>
-                    <div class="search-group">
-                        <i class="fas fa-shield-heart"></i>
-                        <select id="insurance-select">
-                            <option value="">Select Insurance Provider</option>
-                            <option value="aetna">Aetna</option>
-                            <option value="bluecross">Blue Cross Blue Shield</option>
-                            <option value="cigna">Cigna</option>
-                            <option value="medicare">Medicare</option>
-                            <option value="medicaid">Medicaid</option>
-                            <option value="united">UnitedHealthcare</option>
-                        </select>
-                    </div>
-                    <div class="search-group">
-                        <i class="fas fa-stethoscope"></i>
-                        <select id="specialty-select">
-                            <option value="">Select Specialty</option>
-                            <option value="cardiology">General Cardiology</option>
-                            <option value="intervention">Interventional Cardiology</option>
-                            <option value="electrophysiology">Electrophysiology</option>
-                            <option value="pediatric">Pediatric Cardiology</option>
-                        </select>
-                    </div>
-                    <button id="search-btn" class="primary-btn">
-                        Search
-                        <i class="fas fa-search"></i>
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1 class="animate-text">
+                    <span>Revolutionizing</span>
+                    <span class="gradient-text">Heart Health</span>
+                    <span>Through AI & Innovation</span>
+                </h1>
+                <p class="hero-description">Empowering communities with advanced AI-driven cardiovascular care and accessible health solutions.</p>
+                <div class="cta-group">
+                    <button class="primary-btn" onclick="document.getElementById('find-care').scrollIntoView({behavior: 'smooth'})">
+                        Find Care Near You
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="secondary-btn" onclick="openAIAssistant()">
+                        Talk to AI Assistant
+                        <i class="fas fa-robot"></i>
                     </button>
                 </div>
+            </div>
+            <div class="hero-3d">
+                <spline-viewer url="https://prod.spline.design/iq5yCbw5hRGhsW8D/scene.splinecode" loading="lazy"></spline-viewer>
+            </div>
+        </section>
+
+        <!-- Find Care Section -->
+        <section id="find-care" class="find-care">
+            <div class="section-content">
+                <h2>Find Cardiovascular Care</h2>
+                <p class="section-subtitle">Locate specialized care based on your location and insurance</p>
                 
-                <div class="results-container">
-                    <div id="map" class="map"></div>
-                    <div id="results-list" class="results-list">
-                        <!-- Results will be populated dynamically -->
+                <div class="search-container">
+                    <div class="search-filters">
+                        <div class="search-group">
+                            <i class="fas fa-location-dot"></i>
+                            <input type="text" id="location-input" placeholder="Enter ZIP code or address">
+                        </div>
+                        <div class="search-group">
+                            <i class="fas fa-shield-heart"></i>
+                            <select id="insurance-select">
+                                <option value="">Select Insurance Provider</option>
+                                <option value="aetna">Aetna</option>
+                                <option value="bluecross">Blue Cross Blue Shield</option>
+                                <option value="cigna">Cigna</option>
+                                <option value="medicare">Medicare</option>
+                                <option value="medicaid">Medicaid</option>
+                                <option value="united">UnitedHealthcare</option>
+                            </select>
+                        </div>
+                        <div class="search-group">
+                            <i class="fas fa-stethoscope"></i>
+                            <select id="specialty-select">
+                                <option value="">Select Specialty</option>
+                                <option value="cardiology">General Cardiology</option>
+                                <option value="intervention">Interventional Cardiology</option>
+                                <option value="electrophysiology">Electrophysiology</option>
+                                <option value="pediatric">Pediatric Cardiology</option>
+                            </select>
+                        </div>
+                        <button id="search-btn" class="primary-btn">
+                            Search
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="results-container">
+                        <div id="map" class="map"></div>
+                        <div id="results-list" class="results-list">
+                            <!-- Results will be populated dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Solutions Section -->
-    <section id="solutions" class="solutions">
-        <div class="section-content">
-            <h2>AI-Powered Solutions</h2>
-            <p class="section-subtitle">Cutting-edge technology for better heart health</p>
-            
-            <div class="solutions-grid">
-                <div class="solution-card">
-                    <div class="card-3d">
-                        <spline-viewer url="https://prod.spline.design/yNJGRn5vT8hZf2Bq/scene.splinecode" loading="lazy"></spline-viewer>
+        <!-- Solutions Section -->
+        <section id="solutions" class="solutions">
+            <div class="section-content">
+                <h2>AI-Powered Solutions</h2>
+                <p class="section-subtitle">Cutting-edge technology for better heart health</p>
+                
+                <div class="solutions-grid">
+                    <div class="solution-card">
+                        <div class="card-3d">
+                            <spline-viewer url="https://prod.spline.design/yNJGRn5vT8hZf2Bq/scene.splinecode" loading="lazy"></spline-viewer>
+                        </div>
+                        <h3>AI Diagnostics</h3>
+                        <p>Advanced machine learning for early detection and precise diagnosis of cardiovascular conditions.</p>
+                        <ul class="feature-list">
+                            <li>ECG Analysis</li>
+                            <li>Risk Prediction</li>
+                            <li>Pattern Recognition</li>
+                        </ul>
                     </div>
-                    <h3>AI Diagnostics</h3>
-                    <p>Advanced machine learning for early detection and precise diagnosis of cardiovascular conditions.</p>
-                    <ul class="feature-list">
-                        <li>ECG Analysis</li>
-                        <li>Risk Prediction</li>
-                        <li>Pattern Recognition</li>
-                    </ul>
-                </div>
 
-                <div class="solution-card">
-                    <div class="card-3d">
-                        <spline-viewer url="https://prod.spline.design/HKjM9UtEe4xWvQpD/scene.splinecode" loading="lazy"></spline-viewer>
+                    <div class="solution-card">
+                        <div class="card-3d">
+                            <spline-viewer url="https://prod.spline.design/HKjM9UtEe4xWvQpD/scene.splinecode" loading="lazy"></spline-viewer>
+                        </div>
+                        <h3>Remote Monitoring</h3>
+                        <p>Continuous health tracking and real-time alerts through smart devices and AI analysis.</p>
+                        <ul class="feature-list">
+                            <li>24/7 Monitoring</li>
+                            <li>Smart Alerts</li>
+                            <li>Data Analytics</li>
+                        </ul>
                     </div>
-                    <h3>Remote Monitoring</h3>
-                    <p>Continuous health tracking and real-time alerts through smart devices and AI analysis.</p>
-                    <ul class="feature-list">
-                        <li>24/7 Monitoring</li>
-                        <li>Smart Alerts</li>
-                        <li>Data Analytics</li>
-                    </ul>
-                </div>
 
-                <div class="solution-card">
-                    <div class="card-3d">
-                        <spline-viewer url="https://prod.spline.design/RwXcL6TfmP3nYkVs/scene.splinecode" loading="lazy"></spline-viewer>
+                    <div class="solution-card">
+                        <div class="card-3d">
+                            <spline-viewer url="https://prod.spline.design/RwXcL6TfmP3nYkVs/scene.splinecode" loading="lazy"></spline-viewer>
+                        </div>
+                        <h3>Virtual Care</h3>
+                        <p>AI-enhanced telemedicine platform for remote consultations and care management.</p>
+                        <ul class="feature-list">
+                            <li>Video Consultations</li>
+                            <li>AI Assistance</li>
+                            <li>Care Coordination</li>
+                        </ul>
                     </div>
-                    <h3>Virtual Care</h3>
-                    <p>AI-enhanced telemedicine platform for remote consultations and care management.</p>
-                    <ul class="feature-list">
-                        <li>Video Consultations</li>
-                        <li>AI Assistance</li>
-                        <li>Care Coordination</li>
-                    </ul>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <!-- AI Assistant -->
     <div class="ai-assistant" id="ai-assistant">
