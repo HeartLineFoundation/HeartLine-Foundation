@@ -1,19 +1,19 @@
 // Chatbot knowledge base
 const chatbotResponses = {
     // Heart-related questions
-    'heart attack symptoms': 'Common heart attack symptoms include chest pain/pressure, shortness of breath, pain in arms/jaw, nausea, and cold sweats. If you experience these symptoms, seek immediate medical attention.',
-    'heart health tips': 'To maintain heart health: exercise regularly, eat a balanced diet, maintain healthy weight, avoid smoking, limit alcohol, manage stress, and get regular check-ups.',
-    'blood pressure': 'Normal blood pressure is generally considered below 120/80 mmHg. High blood pressure can lead to heart disease and should be monitored regularly.',
+    'heart_attack_symptoms': 'Common heart attack symptoms include chest pain/pressure, shortness of breath, pain in arms/jaw, nausea, and cold sweats. If you experience these symptoms, seek immediate medical attention.',
+    'heart_health_tips': 'To maintain heart health: exercise regularly, eat a balanced diet, maintain healthy weight, avoid smoking, limit alcohol, manage stress, and get regular check-ups.',
+    'blood_pressure': 'Normal blood pressure is generally considered below 120/80 mmHg. High blood pressure can lead to heart disease and should be monitored regularly.',
     
     // Nonprofit information
-    'about foundation': 'Heartline Foundation is a student-led nonprofit founded in 2025, dedicated to transforming cardiology through AI-driven innovation and making heart healthcare more accessible.',
+    'about_foundation': 'Heartline Foundation is a student-led nonprofit founded in 2025, dedicated to transforming cardiology through AI-driven innovation and making heart healthcare more accessible.',
     'mission': 'Our mission is to improve heart health through cutting-edge technology, research, and compassionate care, while making cardiac care more accessible to all.',
     'team': 'Our team is led by Mithun Gopinath (Founder) and Shubh Patel (Vice President), along with dedicated volunteers committed to improving heart health through innovation.',
     'contact': 'You can reach us through our Instagram @the_heartlinefoundation or email us directly.',
     
     // Default responses
     'default': "I'm here to help with questions about heart health and our foundation. Could you please rephrase your question?",
-    'greeting': "Hello! I'm the Heartline AI Assistant. How can I help you today?",
+    'greeting': "Hello! I'm the Heartline AI Assistant. How can I help you today?"
 };
 
 // Function to find the best matching response
@@ -26,10 +26,10 @@ function findBestResponse(input) {
     }
     
     // Find the best matching topic
-    let bestMatch = null;
+    let bestMatch = 'default';
     let highestScore = 0;
     
-    for (let topic in chatbotResponses) {
+    Object.keys(chatbotResponses).forEach(topic => {
         if (topic !== 'default' && topic !== 'greeting') {
             const score = calculateMatchScore(input, topic);
             if (score > highestScore) {
@@ -37,14 +37,14 @@ function findBestResponse(input) {
                 bestMatch = topic;
             }
         }
-    }
+    });
     
     return highestScore > 0.3 ? chatbotResponses[bestMatch] : chatbotResponses.default;
 }
 
 // Calculate match score between input and topic
 function calculateMatchScore(input, topic) {
-    const topicWords = topic.split(' ');
+    const topicWords = topic.split('_');
     let matchCount = 0;
     
     topicWords.forEach(word => {
@@ -54,226 +54,192 @@ function calculateMatchScore(input, topic) {
     return matchCount / topicWords.length;
 }
 
-// Initialize Three.js scene
-let scene, camera, renderer, heart;
+// Initialize Three.js Scene
+let scene, camera, renderer;
+let heart = null;
 
-function initThreeJS() {
+function initThree() {
+    // Create scene
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     
+    // Set up camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+    
+    // Set up renderer
+    const canvas = document.querySelector('#bg');
+    renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
     
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(0, 1, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
     
-    // Load heart model
-    const loader = new THREE.GLTFLoader();
-    loader.load('heart.glb', (gltf) => {
-        heart = gltf.scene;
-        heart.scale.set(2, 2, 2);
-        scene.add(heart);
-        
-        // Animate heart
-        gsap.to(heart.rotation, {
-            y: Math.PI * 2,
-            duration: 20,
-            repeat: -1,
-            ease: "none"
-        });
+    // Create a heart shape using basic geometry
+    createHeartShape();
+    
+    // Start animation loop
+    animate();
+}
+
+function createHeartShape() {
+    // Create a heart shape using a torus and sphere geometry
+    const heartMaterial = new THREE.MeshPhongMaterial({
+        color: 0xff3d00,
+        shininess: 100
     });
     
-    camera.position.z = 5;
+    // Create the main heart shape using a torus
+    const torusGeometry = new THREE.TorusGeometry(1, 0.5, 16, 100);
+    const torus = new THREE.Mesh(torusGeometry, heartMaterial);
+    torus.rotation.x = Math.PI / 2;
     
-    // Add OrbitControls
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    // Create spheres for the top curves
+    const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+    const sphere1 = new THREE.Mesh(sphereGeometry, heartMaterial);
+    const sphere2 = new THREE.Mesh(sphereGeometry, heartMaterial);
     
-    animate();
+    sphere1.position.set(-0.5, 0.5, 0);
+    sphere2.position.set(0.5, 0.5, 0);
+    
+    // Group all parts together
+    heart = new THREE.Group();
+    heart.add(torus);
+    heart.add(sphere1);
+    heart.add(sphere2);
+    
+    // Add to scene
+    scene.add(heart);
+    
+    // Animate heart
+    gsap.to(heart.rotation, {
+        y: Math.PI * 2,
+        duration: 20,
+        repeat: -1,
+        ease: "none"
+    });
 }
 
 function animate() {
     requestAnimationFrame(animate);
+    
+    if (heart) {
+        heart.rotation.y += 0.005;
+    }
+    
     renderer.render(scene, camera);
 }
 
-// Enhanced AI Chatbot with TensorFlow.js
+// Handle window resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// AI Health Assistant
 class AIHealthAssistant {
     constructor() {
-        this.model = null;
-        this.encoder = null;
-        this.responses = {
-            greeting: [
-                "Hello! I'm your AI Health Assistant. How can I help you today?",
-                "Hi there! I'm here to help with any health-related questions.",
-                "Welcome! I'm your personal health AI. What would you like to know?"
-            ],
-            emergency: [
-                "If you're experiencing a medical emergency, please call emergency services immediately.",
-                "This seems serious. Please dial emergency services right away.",
-                "For immediate medical attention, please contact emergency services."
-            ],
-            symptoms: {
-                "chest pain": "Chest pain could be serious. Common causes include heart attack, angina, or muscle strain. Please seek immediate medical attention if severe.",
-                "shortness of breath": "Difficulty breathing can be caused by various conditions. If sudden or severe, seek immediate medical attention.",
-                "irregular heartbeat": "Irregular heartbeat might indicate arrhythmia. Monitor your symptoms and consult a healthcare provider.",
-                "fatigue": "Fatigue can be related to various factors. Maintain a healthy lifestyle and consult a doctor if persistent."
-            },
-            tips: [
-                "Regular exercise is crucial for heart health. Aim for at least 150 minutes of moderate activity per week.",
-                "Maintain a heart-healthy diet rich in fruits, vegetables, and whole grains.",
-                "Monitor your blood pressure regularly and keep it within healthy ranges.",
-                "Manage stress through relaxation techniques and regular exercise.",
-                "Get adequate sleep - aim for 7-9 hours per night.",
-                "Stay hydrated by drinking plenty of water throughout the day."
-            ]
+        this.container = document.querySelector('.ai-assistant');
+        this.messagesContainer = this.container.querySelector('.messages');
+        this.input = this.container.querySelector('input');
+        this.sendButton = this.container.querySelector('.send');
+        this.toggleButton = this.container.querySelector('.toggle-ai');
+        
+        this.setupEventListeners();
+        this.addMessage("Hello! How can I help you with heart health today?", 'bot');
+    }
+    
+    setupEventListeners() {
+        this.sendButton.addEventListener('click', () => this.handleUserInput());
+        this.input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleUserInput();
+        });
+        this.toggleButton.addEventListener('click', () => this.toggleAssistant());
+        
+        document.querySelectorAll('.quick-actions button').forEach(button => {
+            button.addEventListener('click', () => this.handleQuickAction(button.dataset.action));
+        });
+    }
+    
+    handleUserInput() {
+        const message = this.input.value.trim();
+        if (!message) return;
+        
+        this.addMessage(message, 'user');
+        this.input.value = '';
+        
+        if (this.isEmergency(message)) {
+            this.handleEmergency();
+            return;
+        }
+        
+        const response = findBestResponse(message);
+        this.addMessage(response, 'bot');
+    }
+    
+    isEmergency(message) {
+        const emergencyKeywords = ['emergency', 'help', 'pain', 'chest pain', 'heart attack', 'difficulty breathing'];
+        return emergencyKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+    
+    handleEmergency() {
+        const response = "This seems like an emergency situation. Please:\n" +
+            "1. Call emergency services immediately (911)\n" +
+            "2. Stay calm and seated\n" +
+            "3. If available, take aspirin\n" +
+            "4. Unlock your door for emergency responders\n" +
+            "5. Keep talking to me while help arrives";
+        
+        this.addMessage(response, 'bot', true);
+    }
+    
+    handleQuickAction(action) {
+        const responses = {
+            'checkup': "Let's check your heart health. What symptoms or concerns do you have?",
+            'emergency': "If you're experiencing a medical emergency, please call 911 immediately. What symptoms are you having?",
+            'tips': "Here are some key heart health tips:\n" +
+                   "1. Exercise regularly\n" +
+                   "2. Maintain a healthy diet\n" +
+                   "3. Monitor blood pressure\n" +
+                   "4. Get regular check-ups\n" +
+                   "5. Manage stress levels"
         };
-        this.initializeAI();
+        
+        this.addMessage(responses[action] || responses.tips, 'bot');
     }
-
-    async initializeAI() {
-        // Load TensorFlow.js model
-        this.encoder = await use.load();
-        console.log('AI Health Assistant initialized');
+    
+    addMessage(text, sender, isEmergency = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        if (isEmergency) messageDiv.classList.add('emergency');
+        messageDiv.textContent = text;
+        
+        this.messagesContainer.appendChild(messageDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
     }
-
-    async processInput(input) {
-        if (!input.trim()) return;
-        
-        const embeddings = await this.encoder.embed([input.toLowerCase()]);
-        const inputVector = await embeddings.array();
-        
-        // Analyze input for emergency keywords
-        if (this.isEmergency(input)) {
-            return this.getEmergencyResponse();
-        }
-        
-        // Check for symptoms
-        const symptomMatch = this.matchSymptoms(input);
-        if (symptomMatch) {
-            return symptomMatch;
-        }
-        
-        // Generate contextual response
-        return this.generateResponse(input);
-    }
-
-    isEmergency(input) {
-        const emergencyKeywords = ['emergency', 'severe pain', 'heart attack', 'unconscious', 'collapse'];
-        return emergencyKeywords.some(keyword => input.toLowerCase().includes(keyword));
-    }
-
-    matchSymptoms(input) {
-        for (let symptom in this.responses.symptoms) {
-            if (input.toLowerCase().includes(symptom)) {
-                return this.responses.symptoms[symptom];
-            }
-        }
-        return null;
-    }
-
-    generateResponse(input) {
-        // Simple response generation logic
-        if (input.match(/\b(hi|hello|hey)\b/i)) {
-            return this.responses.greeting[Math.floor(Math.random() * this.responses.greeting.length)];
-        }
-        
-        if (input.includes('tip') || input.includes('advice')) {
-            return this.responses.tips[Math.floor(Math.random() * this.responses.tips.length)];
-        }
-        
-        return "I understand you're asking about " + input + ". Could you please provide more specific details about your concern?";
+    
+    toggleAssistant() {
+        this.container.classList.toggle('collapsed');
     }
 }
 
+// Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize chatbot UI
-    const chatContainer = document.getElementById('chatbot-container');
-    const toggleChat = document.getElementById('toggle-chat');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-message');
+    initThree();
+    const aiAssistant = new AIHealthAssistant();
     
-    // Toggle chat visibility
-    toggleChat.addEventListener('click', () => {
-        chatContainer.classList.toggle('collapsed');
-        if (!chatContainer.classList.contains('collapsed')) {
-            chatInput.focus();
-        }
-    });
-    
-    // Function to add message to chat
-    function addMessage(message, isUser = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-        messageDiv.textContent = message;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-    
-    // Handle sending messages
-    function sendMessage() {
-        const message = chatInput.value.trim();
-        if (message) {
-            addMessage(message, true);
-            chatInput.value = '';
-            
-            // Get bot response
-            setTimeout(() => {
-                const response = findBestResponse(message);
-                addMessage(response);
-            }, 500);
-        }
-    }
-    
-    // Send message on button click
-    sendButton.addEventListener('click', sendMessage);
-    
-    // Send message on Enter key
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-    
-    // Mobile menu toggle
-    const menuBtn = document.querySelector('.menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-    }
-
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu if open
-                navLinks.classList.remove('active');
-            }
-        });
-    });
-
-    // Enhanced 3D card effects
-    const cards = document.querySelectorAll('.solution-card, .research-card, .value-card');
-    
-    cards.forEach(card => {
+    // Initialize 3D card effects
+    document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -282,277 +248,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            const rotateX = ((y - centerY) / centerY) * 10;
-            const rotateY = ((x - centerX) / centerX) * 10;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
             
-            card.style.transform = `perspective(1000px) rotateX(${-rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-            card.style.transition = 'none';
-            
-            // Add glowing effect
-            const glowX = (x / rect.width) * 100;
-            const glowY = (y / rect.height) * 100;
-            card.style.background = `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255,255,255,0.2), transparent)`;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
         });
         
         card.addEventListener('mouseleave', () => {
             card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-            card.style.transition = 'all 0.5s ease';
-            card.style.background = 'white';
         });
     });
-
-    // Intersection Observer for animations
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('reveal');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.pre-animate').forEach(element => {
-        observer.observe(element);
-    });
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.nav-links') && !e.target.closest('.menu-btn')) {
-            navLinks.classList.remove('active');
-        }
-    });
-
-    // Smooth scroll for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu after clicking a link
-                navLinks.classList.remove('active');
-            }
-        });
-    });
-
-    // Scroll progress indicator
-    const scrollProgress = document.querySelector('.scroll-progress');
-
-    window.addEventListener('scroll', () => {
-        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (window.scrollY / windowHeight) * 100;
-        scrollProgress.style.transform = `scaleX(${scrolled / 100})`;
-    });
-
-    // Add active class to nav links on scroll
-    const sections = document.querySelectorAll('section');
-    const navItems = document.querySelectorAll('.nav-links a');
-
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (window.scrollY >= sectionTop - 60) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href').slice(1) === current) {
-                item.classList.add('active');
-            }
-        });
-    });
-
-    // Navbar scroll effect with progress bar
-    let lastScroll = 0;
-    const navbar = document.querySelector('nav');
-    
-    // Create progress bar
-    const progressBar = document.createElement('div');
-    progressBar.className = 'scroll-progress';
-    document.body.appendChild(progressBar);
-
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        
-        // Update progress bar
-        const scrolled = (currentScroll / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        progressBar.style.width = `${scrolled}%`;
-        
-        // Navbar hide/show effect
-        if (currentScroll <= 0) {
-            navbar.classList.remove('scroll-up');
-            return;
-        }
-        
-        if (currentScroll > lastScroll && !navbar.classList.contains('scroll-down')) {
-            navbar.classList.remove('scroll-up');
-            navbar.classList.add('scroll-down');
-        } else if (currentScroll < lastScroll && navbar.classList.contains('scroll-down')) {
-            navbar.classList.remove('scroll-down');
-            navbar.classList.add('scroll-up');
-        }
-        lastScroll = currentScroll;
-    });
-
-    // Parallax effect for hero section
-    const hero = document.querySelector('.hero');
-    const heroContent = document.querySelector('.hero-content');
-    
-    window.addEventListener('scroll', () => {
-        const scroll = window.pageYOffset;
-        if (hero && heroContent) {
-            hero.style.backgroundPositionY = `${scroll * 0.5}px`;
-            heroContent.style.transform = `translateY(${scroll * 0.3}px)`;
-            heroContent.style.opacity = 1 - (scroll * 0.003);
-        }
-    });
-
-    // Animate hero text on load
-    const heroText = document.querySelector('.hero h1');
-    if (heroText) {
-        heroText.style.opacity = '0';
-        heroText.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            heroText.style.transition = 'all 1s ease';
-            heroText.style.opacity = '1';
-            heroText.style.transform = 'translateY(0)';
-        }, 500);
-    }
-
-    // Add hover effect to buttons
-    document.querySelectorAll('.primary-btn, .secondary-btn').forEach(button => {
-        button.addEventListener('mousemove', (e) => {
-            const rect = button.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            button.style.setProperty('--x', `${x}px`);
-            button.style.setProperty('--y', `${y}px`);
-        });
-    });
-
-    // Initialize 3D scene
-    initThreeJS();
-    
-    // Initialize AI Assistant
-    const aiAssistant = new AIHealthAssistant();
-    const assistant = document.getElementById('ai-assistant');
-    const toggleBtn = assistant.querySelector('.toggle-ai');
-    const input = assistant.querySelector('input');
-    const sendBtn = assistant.querySelector('.send');
-    const messages = assistant.querySelector('.messages');
-    
-    // Toggle AI Assistant
-    toggleBtn.addEventListener('click', () => {
-        assistant.classList.toggle('collapsed');
-    });
-    
-    // Handle sending messages
-    async function sendMessage() {
-        const text = input.value.trim();
-        if (!text) return;
-        
-        // Add user message
-        addMessage(text, true);
-        input.value = '';
-        
-        // Get AI response
-        const response = await aiAssistant.processInput(text);
-        addMessage(response, false);
-    }
-    
-    function addMessage(text, isUser) {
-        const message = document.createElement('div');
-        message.className = `message ${isUser ? 'user' : 'bot'}`;
-        message.textContent = text;
-        messages.appendChild(message);
-        messages.scrollTop = messages.scrollHeight;
-    }
-    
-    sendBtn.addEventListener('click', sendMessage);
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-    
-    // Handle feature buttons
-    const featureButtons = assistant.querySelectorAll('.feature-btn');
-    featureButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const feature = btn.dataset.feature;
-            switch (feature) {
-                case 'diagnosis':
-                    addMessage("Please describe your symptoms, and I'll help assess them.", false);
-                    break;
-                case 'tips':
-                    const tip = aiAssistant.responses.tips[Math.floor(Math.random() * aiAssistant.responses.tips.length)];
-                    addMessage(tip, false);
-                    break;
-                case 'emergency':
-                    addMessage(aiAssistant.responses.emergency[0], false);
-                    break;
-            }
-        });
-    });
-    
-    // Initialize 3D card effects
-    initializeCardEffects();
 });
 
-// 3D Card Effects
-function initializeCardEffects() {
-    const cards = document.querySelectorAll('.solution-card, .research-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = ((y - centerY) / centerY) * 10;
-            const rotateY = ((x - centerX) / centerX) * 10;
-            
-            gsap.to(card, {
-                duration: 0.5,
-                rotateX: -rotateX,
-                rotateY: rotateY,
-                scale: 1.05,
-                ease: "power2.out"
-            });
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-                duration: 0.5,
-                rotateX: 0,
-                rotateY: 0,
-                scale: 1,
-                ease: "power2.out"
-            });
-        });
-    });
-}
-
-// Parallax effect
+// Parallax Effect
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
-    const parallaxElements = document.querySelectorAll('.parallax-layer');
+    const parallaxElements = document.querySelectorAll('.parallax');
     
     parallaxElements.forEach(element => {
         const speed = element.dataset.speed || 0.5;
