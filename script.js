@@ -154,24 +154,96 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeAIAssistant();
 });
 
+// Navigation functionality
+function initializeNavigation() {
+    const nav = document.querySelector('.nav-container');
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    // Toggle mobile menu
+    menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+    });
+
+    // Handle navigation background on scroll
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            nav.style.background = 'rgba(0, 0, 0, 0.95)';
+        } else {
+            nav.style.background = 'rgba(0, 0, 0, 0.8)';
+        }
+    });
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector(anchor.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                navLinks.classList.remove('active');
+            }
+        });
+    });
+}
+
+// GSAP Animations
 function initializeAnimations() {
-    // GSAP Animations
     gsap.registerPlugin(ScrollTrigger);
     
-    // Animate hero section
-    gsap.from('.hero-content', {
+    // Hero section animations
+    gsap.from('.hero-content h1 span', {
         opacity: 0,
         y: 50,
         duration: 1,
+        stagger: 0.2,
         ease: 'power3.out'
     });
 
-    // Animate cards on scroll
-    gsap.utils.toArray('.card-3d').forEach(card => {
+    gsap.from('.hero-content p', {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        delay: 0.5,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.cta-group button', {
+        opacity: 0,
+        y: 20,
+        duration: 0.8,
+        delay: 0.8,
+        stagger: 0.2,
+        ease: 'power3.out'
+    });
+
+    // Animate sections on scroll
+    gsap.utils.toArray('section').forEach(section => {
+        gsap.from(section.children, {
+            scrollTrigger: {
+                trigger: section,
+                start: 'top 80%',
+                end: 'top 20%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power3.out'
+        });
+    });
+
+    // Animate solution cards
+    gsap.utils.toArray('.solution-card').forEach(card => {
         gsap.from(card, {
             scrollTrigger: {
                 trigger: card,
-                start: 'top bottom-=100',
+                start: 'top 80%',
                 toggleActions: 'play none none reverse'
             },
             opacity: 0,
@@ -182,51 +254,7 @@ function initializeAnimations() {
     });
 }
 
-function initializeHealthcareLocator() {
-    const healthcareLocator = new HealthcareLocator();
-    healthcareLocator.initialize();
-}
-
-function initializeAIAssistant() {
-    const aiAssistant = new AIHealthAssistant();
-    aiAssistant.initialize();
-}
-
-// Navigation
-const nav = document.querySelector('.nav-container');
-const menuToggle = document.querySelector('.menu-toggle');
-const navLinks = document.querySelector('.nav-links');
-
-menuToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    menuToggle.classList.toggle('active');
-});
-
-// Handle navigation background on scroll
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        nav.style.background = 'rgba(10, 12, 16, 0.95)';
-    } else {
-        nav.style.background = 'rgba(10, 12, 16, 0.8)';
-    }
-});
-
-// Smooth scroll for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-            navLinks.classList.remove('active');
-        }
-    });
-});
-
-// Healthcare Location Search
+// Healthcare Locator
 class HealthcareLocator {
     constructor() {
         this.map = null;
@@ -236,50 +264,47 @@ class HealthcareLocator {
         this.insuranceSelect = document.getElementById('insurance-select');
         this.specialtySelect = document.getElementById('specialty-select');
         this.resultsList = document.getElementById('results-list');
-        
+    }
+
+    initialize() {
         this.initMap();
         this.setupEventListeners();
     }
-    
+
     initMap() {
-        // Initialize Leaflet map
         this.map = L.map('map').setView([37.0902, -95.7129], 4);
         
-        // Add dark theme tile layer
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(this.map);
     }
-    
+
     setupEventListeners() {
         this.searchBtn.addEventListener('click', () => this.searchLocations());
         this.locationInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.searchLocations();
         });
     }
-    
+
     async searchLocations() {
         const location = this.locationInput.value;
-        const insurance = this.insuranceSelect.value;
-        const specialty = this.specialtySelect.value;
-        
         if (!location) {
             alert('Please enter a location');
             return;
         }
-        
+
         try {
             const coordinates = await this.geocodeLocation(location);
             if (coordinates) {
-                this.searchNearbyProviders(coordinates.lat, coordinates.lon, insurance, specialty);
+                this.searchNearbyProviders(coordinates);
             }
         } catch (error) {
             console.error('Error searching locations:', error);
             alert('Error searching for locations. Please try again.');
         }
     }
-    
+
     async geocodeLocation(location) {
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
@@ -297,43 +322,40 @@ class HealthcareLocator {
             throw error;
         }
     }
-    
-    searchNearbyProviders(lat, lon, insurance, specialty) {
-        // Clear previous results
+
+    searchNearbyProviders(coordinates) {
         this.clearResults();
-        
-        // Simulate API call to healthcare provider database
-        const mockProviders = this.getMockProviders(lat, lon, insurance, specialty);
-        this.displayResults(mockProviders);
+        const providers = this.getMockProviders(coordinates);
+        this.displayResults(providers);
     }
-    
-    getMockProviders(lat, lon, insurance, specialty) {
-        // Simulate nearby providers
+
+    getMockProviders(coordinates) {
         const providers = [];
         const numProviders = Math.floor(Math.random() * 5) + 5;
         
+        const specialties = ['Cardiologist', 'Heart Surgeon', 'Vascular Specialist'];
+        const hospitals = ['Heart Center', 'Medical Center', 'Cardiac Care'];
+        
         for (let i = 0; i < numProviders; i++) {
-            const provider = {
-                name: `Dr. ${['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'][Math.floor(Math.random() * 5)]}`,
-                specialty: specialty || 'Cardiology',
+            providers.push({
+                name: `Dr. ${['Smith', 'Johnson', 'Williams', 'Brown', 'Davis'][Math.floor(Math.random() * 5)]}`,
+                specialty: specialties[Math.floor(Math.random() * specialties.length)],
+                hospital: `${['City', 'County', 'Regional'][Math.floor(Math.random() * 3)]} ${hospitals[Math.floor(Math.random() * hospitals.length)]}`,
                 address: `${Math.floor(Math.random() * 1000)} Medical Center Dr`,
                 distance: (Math.random() * 10).toFixed(1),
                 rating: (Math.random() * 2 + 3).toFixed(1),
-                insurance: insurance || 'Most insurances accepted',
-                lat: lat + (Math.random() - 0.5) * 0.1,
-                lon: lon + (Math.random() - 0.5) * 0.1
-            };
-            providers.push(provider);
+                lat: coordinates.lat + (Math.random() - 0.5) * 0.1,
+                lon: coordinates.lon + (Math.random() - 0.5) * 0.1
+            });
         }
         
         return providers;
     }
-    
+
     displayResults(providers) {
-        this.clearResults();
         const bounds = [];
         
-        providers.forEach((provider, index) => {
+        providers.forEach(provider => {
             // Add marker to map
             const marker = L.marker([provider.lat, provider.lon])
                 .bindPopup(this.createPopupContent(provider))
@@ -343,119 +365,147 @@ class HealthcareLocator {
             bounds.push([provider.lat, provider.lon]);
             
             // Create result card
-            const resultCard = document.createElement('div');
-            resultCard.className = 'result-card';
-            resultCard.innerHTML = `
-                <h3>${provider.name}</h3>
-                <p class="specialty">${provider.specialty}</p>
-                <p class="address">${provider.address}</p>
-                <p class="distance">${provider.distance} miles away</p>
-                <div class="rating">
-                    <span class="stars">${'★'.repeat(Math.floor(provider.rating))}${provider.rating % 1 >= 0.5 ? '½' : ''}</span>
-                    <span class="rating-number">${provider.rating}</span>
+            const card = document.createElement('div');
+            card.className = 'provider-card';
+            card.innerHTML = `
+                <div class="provider-info">
+                    <h3>${provider.name}</h3>
+                    <p class="specialty">${provider.specialty}</p>
+                    <p class="hospital">${provider.hospital}</p>
+                    <p class="address">${provider.address}</p>
+                    <p class="distance">${provider.distance} miles away</p>
+                    <div class="rating">
+                        ${this.createRatingStars(provider.rating)}
+                        <span>${provider.rating}</span>
+                    </div>
                 </div>
-                <p class="insurance">${provider.insurance}</p>
-                <button class="book-btn">Book Appointment</button>
+                <div class="provider-actions">
+                    <button class="book-btn" onclick="window.open('tel:+1234567890')">
+                        <i class="fas fa-phone"></i>
+                        Call Now
+                    </button>
+                    <button class="directions-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${provider.lat},${provider.lon}')">
+                        <i class="fas fa-directions"></i>
+                        Directions
+                    </button>
+                </div>
             `;
             
-            // Add click event to card
-            resultCard.addEventListener('click', () => {
+            card.addEventListener('click', () => {
                 marker.openPopup();
                 this.map.setView([provider.lat, provider.lon], 14);
             });
             
-            this.resultsList.appendChild(resultCard);
+            this.resultsList.appendChild(card);
         });
         
-        // Fit map to bounds if there are results
         if (bounds.length > 0) {
             this.map.fitBounds(bounds);
         }
     }
-    
+
+    createRatingStars(rating) {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let stars = '';
+        
+        for (let i = 0; i < 5; i++) {
+            if (i < fullStars) {
+                stars += '<i class="fas fa-star"></i>';
+            } else if (i === fullStars && hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            } else {
+                stars += '<i class="far fa-star"></i>';
+            }
+        }
+        
+        return stars;
+    }
+
     createPopupContent(provider) {
         return `
-            <div class="info-window">
+            <div class="map-popup">
                 <h3>${provider.name}</h3>
                 <p>${provider.specialty}</p>
+                <p>${provider.hospital}</p>
                 <p>${provider.address}</p>
                 <p>${provider.distance} miles away</p>
-                <button onclick="window.open('tel:+1234567890')">Call Now</button>
+                <div class="popup-actions">
+                    <button onclick="window.open('tel:+1234567890')">
+                        <i class="fas fa-phone"></i>
+                        Call
+                    </button>
+                    <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${provider.lat},${provider.lon}')">
+                        <i class="fas fa-directions"></i>
+                        Directions
+                    </button>
+                </div>
             </div>
         `;
     }
-    
+
     clearResults() {
-        // Clear markers
         this.markers.forEach(marker => this.map.removeLayer(marker));
         this.markers = [];
-        
-        // Clear result list
         this.resultsList.innerHTML = '';
     }
 }
 
-// AI Health Assistant
+// AI Assistant
 class AIHealthAssistant {
     constructor() {
         this.container = document.getElementById('ai-assistant');
         this.messages = document.getElementById('ai-messages');
         this.input = document.getElementById('ai-input');
         this.sendBtn = document.getElementById('ai-send');
-        this.minimizeBtn = document.querySelector('.minimize-btn');
-        this.closeBtn = document.querySelector('.close-btn');
-        this.tabBtns = document.querySelectorAll('.tab-btn');
-        this.tabPanes = document.querySelectorAll('.tab-pane');
-        
-        this.setupEventListeners();
-        this.initializeAI();
     }
-    
+
+    initialize() {
+        this.setupEventListeners();
+        this.addWelcomeMessage();
+    }
+
     setupEventListeners() {
         this.sendBtn.addEventListener('click', () => this.handleUserInput());
         this.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleUserInput();
         });
-        
-        this.minimizeBtn.addEventListener('click', () => {
-            this.container.classList.toggle('minimized');
-        });
-        
-        this.closeBtn.addEventListener('click', () => {
-            this.container.classList.add('hidden');
-        });
-        
-        this.tabBtns.forEach(btn => {
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
         });
-        
+
+        // Quick actions
         document.querySelectorAll('.quick-actions button').forEach(btn => {
             btn.addEventListener('click', () => this.handleQuickAction(btn.dataset.action));
         });
+
+        // Minimize/Close buttons
+        document.querySelector('.minimize-btn').addEventListener('click', () => {
+            this.container.classList.toggle('minimized');
+        });
+
+        document.querySelector('.close-btn').addEventListener('click', () => {
+            this.container.classList.add('hidden');
+        });
     }
-    
-    async initializeAI() {
-        try {
-            // Load TensorFlow.js model
-            this.model = await tf.loadLayersModel('path/to/your/model.json');
-            this.addMessage('Hello! I'm your AI Health Assistant. How can I help you today?', 'bot');
-        } catch (error) {
-            console.error('Error loading AI model:', error);
-            this.addMessage('AI Assistant is ready to help you with general health information.', 'bot');
-        }
+
+    addWelcomeMessage() {
+        this.addMessage("Hello! I'm your AI Health Assistant. How can I help you today?", 'bot');
     }
-    
+
     switchTab(tabId) {
-        this.tabBtns.forEach(btn => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabId);
         });
         
-        this.tabPanes.forEach(pane => {
+        document.querySelectorAll('.tab-pane').forEach(pane => {
             pane.classList.toggle('active', pane.id === `${tabId}-tab`);
         });
     }
-    
-    async handleUserInput() {
+
+    handleUserInput() {
         const message = this.input.value.trim();
         if (!message) return;
         
@@ -464,13 +514,12 @@ class AIHealthAssistant {
         
         if (this.isEmergency(message)) {
             this.handleEmergency();
-            return;
+        } else {
+            const response = this.generateResponse(message);
+            this.addMessage(response, 'bot');
         }
-        
-        const response = await this.generateResponse(message);
-        this.addMessage(response, 'bot');
     }
-    
+
     isEmergency(message) {
         const emergencyKeywords = [
             'emergency',
@@ -480,14 +529,18 @@ class AIHealthAssistant {
             'severe pain',
             'unconscious',
             'stroke',
-            'help',
+            'help'
         ];
-        return emergencyKeywords.some(keyword => message.toLowerCase().includes(keyword));
+        
+        return emergencyKeywords.some(keyword => 
+            message.toLowerCase().includes(keyword)
+        );
     }
-    
+
     handleEmergency() {
         const response = `
             🚨 This seems like an emergency situation. Please:
+            
             1. Call emergency services (911) immediately
             2. Stay calm and seated
             3. If available, take aspirin
@@ -502,10 +555,8 @@ class AIHealthAssistant {
         
         this.addMessage(response, 'bot', true);
     }
-    
-    async generateResponse(message) {
-        // In production, this would use the loaded TensorFlow.js model
-        // For now, using pattern matching
+
+    generateResponse(message) {
         const responses = {
             'symptoms': 'Please describe your symptoms in detail. I can help assess their severity.',
             'prevention': 'Heart disease prevention includes: regular exercise, healthy diet, stress management, and regular check-ups.',
@@ -523,12 +574,12 @@ class AIHealthAssistant {
             }
         }
         
-        return 'I understand you're asking about heart health. Could you please be more specific about what you'd like to know?';
+        return "I understand you're asking about heart health. Could you please be more specific about what you'd like to know?";
     }
-    
+
     handleQuickAction(action) {
         const actions = {
-            'checkup': 'Let's check your heart health. What symptoms or concerns do you have?',
+            'checkup': "Let's check your heart health. What symptoms or concerns do you have?",
             'find-doctor': 'I can help you find a cardiologist. Please share your location or ZIP code.',
             'heart-info': `Here are key heart health tips:
                 1. Maintain a healthy diet
@@ -542,7 +593,7 @@ class AIHealthAssistant {
         
         this.addMessage(actions[action] || actions['heart-info'], 'bot');
     }
-    
+
     addMessage(text, sender, isEmergency = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}${isEmergency ? ' emergency' : ''}`;
@@ -552,14 +603,26 @@ class AIHealthAssistant {
         this.messages.scrollTop = this.messages.scrollHeight;
         
         if (sender === 'bot') {
-            messageDiv.style.opacity = '0';
-            messageDiv.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                messageDiv.style.opacity = '1';
-                messageDiv.style.transform = 'translateY(0)';
-            }, 100);
+            gsap.from(messageDiv, {
+                opacity: 0,
+                y: 20,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
         }
     }
+}
+
+// Initialize Healthcare Locator
+function initializeHealthcareLocator() {
+    const healthcareLocator = new HealthcareLocator();
+    healthcareLocator.initialize();
+}
+
+// Initialize AI Assistant
+function initializeAIAssistant() {
+    const aiAssistant = new AIHealthAssistant();
+    aiAssistant.initialize();
 }
 
 // Parallax Effect
@@ -572,3 +635,4 @@ window.addEventListener('scroll', () => {
         element.style.transform = `translateY(${scrolled * speed}px)`;
     });
 });
+
